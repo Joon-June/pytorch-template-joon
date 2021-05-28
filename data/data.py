@@ -22,7 +22,7 @@ class DatasetOnSomething(Dataset):
 def get_dataloader(params):
     data = DatasetOnSomething(params)
 
-    data_loader_params = {"batch_size": CONFIG["batch_size"],
+    data_loader_params = {"batch_size": CONFIG["BATCH_SIZE"],
                           "shuffle": False,
                           "num_workers": 1,
                           "pin_memory": False}
