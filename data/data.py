@@ -2,6 +2,7 @@ import torch
 from torch.utils.data import Dataset
 from torchvision import transforms
 
+from config import CONFIG
 
 class DatasetOnSomething(Dataset):
     def __init__(self, params):
@@ -21,7 +22,7 @@ class DatasetOnSomething(Dataset):
 def get_dataloader(params):
     data = DatasetOnSomething(params)
 
-    data_loader_params = {"batch_size": 100,
+    data_loader_params = {"batch_size": CONFIG["batch_size"],
                           "shuffle": False,
                           "num_workers": 1,
                           "pin_memory": False}
