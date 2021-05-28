@@ -1,7 +1,6 @@
 from torch.utils.tensorboard import SummaryWriter
 from torchsummary import summary
 
-from config.config import CONFIG
 from train_utils import AverageMeter, get_num_parameters
 
 
@@ -19,7 +18,7 @@ class Trainer:
 
         self.train_loss = AverageMeter("Train Loss")
         self.valid_loss = AverageMeter("Validation Loss")
-        self.writer = SummaryWrtier(log_dir=CONFIG["TB_LOGDIR"])
+        self.writer = SummaryWriter(log_dir=self.config["TB_LOGDIR"])
 
         self.stop_training = False
 
@@ -44,7 +43,6 @@ class Trainer:
         return
 
     def on_train_batch_end(self, batch):
-        print(f"Epoch - {epoch} Iter - {i} Train Loss - {float(self.train_loss.val):.10f}")
         return
 
     def on_epoch_begin(self, epoch):
@@ -58,7 +56,7 @@ class Trainer:
             self.stop_training = True
 
         self.writer.add_scalars("Loss", {"Train Loss": self.train_loss.avg, "Validation Loss": self.valid_loss.avg}, global_step=epoch)
-        print(f"Epoch - {epoch} Train Loss - {self.train_loss.avg:.10f} Valid Loss - {self.val_loss:.10f}")
+        print(f"Epoch - {epoch} Train Loss - {self.train_loss.avg:.10f} Valid Loss - {self.valid_loss.avg:.10f}")
 
         self.train_loss.reset()
         self.valid_loss.reset()
@@ -83,6 +81,8 @@ class Trainer:
             self.optimizer.step()
             self.optimizer.zero_grad()
             self.train_loss.update(float(loss))
+
+            print(f"Epoch - {epoch} Iter - {i} Train Loss - {float(self.train_loss.val):.10f}")
 
             self.on_train_batch_end((data, target))
 
