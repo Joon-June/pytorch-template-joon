@@ -116,9 +116,6 @@ class Trainer:
             data, target = data.to(self.device), target.to(self.device)
             out = self.model(data)
             loss = self.criterion(out, target)
-            loss.backward()
-            self.optimizer.step()
-            self.optimizer.zero_grad()
             self.valid_loss.update(float(loss))
 
             self.on_valid_batch_end((data, target))
