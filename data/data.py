@@ -1,8 +1,10 @@
-import torch
-from torch.utils.data import Dataset
+from dataclasses import dataclass
+
+from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 
-from config import CONFIG
+from config import Config
+
 
 class DatasetOnSomething(Dataset):
     def __init__(self, params):
@@ -19,13 +21,47 @@ class DatasetOnSomething(Dataset):
         return transforms.Compose([transforms.ToTensor()])
 
 
-def get_dataloader(params):
-    data = DatasetOnSomething(params)
+def get_train_dataloader(config: Config):
+    data = DatasetOnSomething(config)
 
-    data_loader_params = {"batch_size": CONFIG["BATCH_SIZE"],
-                          "shuffle": False,
-                          "num_workers": 1,
-                          "pin_memory": False}
+    data_loader_params = {
+        "batch_size": config.train_batch_size,
+        "shuffle": True,
+        "num_workers": config.num_workers
+    }
 
-    loader = torch.utils.data.DataLoader(data, **data_loader_params)
+    loader = DataLoader(data, **data_loader_params)
     return loader
+
+
+def get_eval_dataloader(config: Config):
+    data = DatasetOnSomething(config)
+
+    data_loader_params = {
+        "batch_size": config.test_batch_size,
+        "shuffle": False,
+        "num_workers": 0
+    }
+
+    loader = DataLoader(data, **data_loader_params)
+    return loader
+
+
+class DataFetcher:
+    def __init__(self, loader, device=None):
+        self.loader = loader
+        self.device = device
+
+        self.iter = iter(self.loader)
+
+    def _fetch_inputs(self):
+        try:
+            x, y = next(self.iter)
+        except (AttributeError, StopIteration):
+            self.iter = iter(self.loader)
+            x, y = next(self.iter)
+        return x, y
+
+    def __next__(self):
+        x, y = self._fetch_inputs()
+        return x.to(self.device), y.to(self.device)

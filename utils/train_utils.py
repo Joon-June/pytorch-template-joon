@@ -1,3 +1,12 @@
+import dataclasses
+import os
+
+import numpy as np
+import torch
+
+from config import Config
+
+
 class AverageMeter(object):
     """Computes and stores the average and current value"""
 
@@ -52,8 +61,46 @@ class EarlyStopping:
     @staticmethod
     def save_checkpoint(model):
         raise NotImplementedError
-        print("Saved a model at " + model_name)
+
+
+class Writer:
+    def __init__(self, config: Config):
+        self.config = config
+
+    def initialize(self):
+        from dotenv import load_dotenv
+        load_dotenv()
+        assert "WANDB_API_KEY" in os.environ, "WANDB_API_KEY is not given!"
+        self.wandb_run = wandb.init(project=config.project_name, entity="joon-june", name=config.run_name)
+        self.wandb_run.config.update(dataclasses.asdict(self.config))
+
+    def log(self, log_dict, step):
+        self.wandb_run.log(log_dict, step=step)
+
+
+class ModelEval:
+    def __init__(self, model):
+        self.model = model
+
+    def __enter__(self):
+        self.model.eval()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.model.train()
+
+    def __call__(self, x):
+        with torch.no_grad():
+            return self.model(x)
 
 
 def get_num_parameters(model):
     return sum(p.numel() for p in model.parameters())
+
+
+def batch_visualize(batch):
+    raise NotImplementedError
+
+
+def save_checkpoint(batch):
+    raise NotImplementedError
