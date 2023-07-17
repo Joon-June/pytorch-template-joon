@@ -1,5 +1,7 @@
 from tqdm import tqdm
 
+import torch.nn as nn
+
 from config import Config
 from utils import (
     AverageMeter,
@@ -16,7 +18,7 @@ class Trainer:
     def __init__(
         self,
         config: Config,
-        model,
+        model: nn.Module,
         criterion,
         optimizer,
         device,
