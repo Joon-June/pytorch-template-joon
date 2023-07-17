@@ -1,6 +1,7 @@
 import argparse
 
 import torch
+from dotenv import load_dotenv
 
 from libs.config import load_config
 from libs.data import DataFetcher, get_eval_dataloader, get_train_dataloader
@@ -17,6 +18,8 @@ def parse_arguments():
 
 
 def train():
+    load_dotenv()
+    
     args = parse_arguments()
     config = load_config(args.config_path)
 
