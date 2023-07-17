@@ -73,11 +73,11 @@ class Trainer:
         if self.log:
             self.writer.log({"train/loss": self.train_loss.val}, step=self.global_step)
 
-        if self.eval and it % self.config.eval_every == 0:
+        if self.eval and (it + 1) % self.config.eval_every == 0:
             with ModelEval(self.model) as m:
                 self.evaluate(m)
 
-        if self.save and it % self.config.save_every == 0:
+        if self.save and (it + 1) % self.config.save_every == 0:
             save_checkpoint(self.model)
 
     def on_eval_begin(self):
