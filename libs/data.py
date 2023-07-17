@@ -56,12 +56,12 @@ class DataFetcher:
 
     def _fetch_inputs(self):
         try:
-            x, y = next(self.iter)
+            batch = next(self.iter)
         except (AttributeError, StopIteration):
             self.iter = iter(self.loader)
-            x, y = next(self.iter)
-        return x, y
+            batch = next(self.iter)
+        return batch
 
     def __next__(self):
-        x, y = self._fetch_inputs()
-        return x.to(self.device), y.to(self.device)
+        batch = self._fetch_inputs()
+        return batch
