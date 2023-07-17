@@ -39,6 +39,10 @@ class Trainer:
         self.eval_loss = AverageMeter("Eval Loss")
 
         self.log = self.writer is not None
+        self.eval = self.config.eval_every > 0
+        self.viz = self.config.visualize_every > 0
+        self.save = self.config.save_every > 0
+
         self.global_step = 0
         self.step = 0
 
@@ -58,7 +62,7 @@ class Trainer:
 
     def on_train_batch_begin(self, it, batch):
         # Visualize
-        if (it + 1) % self.config.visualize_every == 0:
+        if self.viz and (it + 1) % self.config.visualize_every == 0:
             batch_visualize(batch)
 
     def on_train_batch_end(self, it, batch):
@@ -69,11 +73,11 @@ class Trainer:
         if self.log:
             self.writer.log({"train/loss": self.train_loss.val}, step=self.global_step)
 
-        if it % self.config.eval_every == 0:
+        if self.eval and it % self.config.eval_every == 0:
             with ModelEval(self.model) as m:
                 self.evaluate(m)
 
-        if it % self.config.save_every == 0:
+        if self.save and it % self.config.save_every == 0:
             save_checkpoint(self.model)
 
     def on_eval_begin(self):
