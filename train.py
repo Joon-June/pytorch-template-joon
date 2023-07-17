@@ -40,8 +40,6 @@ def train():
 		train_dataloader=train_dataloader,
 		eval_dataloader=None,
 		writer=None,
-		lr_scheduler=None,
-		early_stopper=None
 	)
 
 	trainer.train()
