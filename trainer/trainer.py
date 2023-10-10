@@ -81,6 +81,9 @@ class Trainer:
 
         if self.save and (it + 1) % self.config.save_every == 0:
             save_checkpoint(self.model)
+		
+		if self.viz and (it + 1) % self.config.visualize_every == 0:
+            batch_visualize(batch)
 
     def on_eval_begin(self):
         return
